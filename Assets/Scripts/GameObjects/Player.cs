@@ -18,7 +18,7 @@ public class Player : MonoBehaviour
     void Start()
     {
         deceleration_ratio = -1;
-        acceleration_ratio = 5;
+        acceleration_ratio = 300;
         rotation_ratio = 3;
         rb = GetComponent<Rigidbody>();
         rb.mass = 100;
@@ -37,8 +37,8 @@ public class Player : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.F))
         {
-            float x = UnityEngine.Random.Range(-6, 6);
-            float y = UnityEngine.Random.Range(-4, 4);
+            float x = UnityEngine.Random.Range(20, Screen.width - 20);
+            float y = UnityEngine.Random.Range(20, Screen.height - 20);
             rb.MovePosition(new Vector3(x, y, 0));
         }
 
@@ -49,7 +49,7 @@ public class Player : MonoBehaviour
     void Update()
     {
 
-
+        Debug.Log(Screen.height);
     }
 
     void RePosition()
@@ -58,24 +58,24 @@ public class Player : MonoBehaviour
         float y = transform.position.y;
         float new_x = x, new_y = y;
         bool trigger = false;
-        if(x > 7)
+        if(x > Screen.width + 20)
         {
-            new_x = -7;
+            new_x = 0;
             trigger = true;
         }
-        if (x < -7)
+        if (x < -20)
         {
-            new_x = 7;
+            new_x = Screen.width + 20;
             trigger = true;
         }
-        if (y > 5.3f)
+        if (y > Screen.height + 20)
         {
-            new_y = -5.3f;
+            new_y = 0;
             trigger = true;
         }
-        if (y < -5.3f)
+        if (y < -20)
         {
-            new_y = 5.3f;
+            new_y = Screen.height + 20;
             trigger = true;
         }
         if (trigger)

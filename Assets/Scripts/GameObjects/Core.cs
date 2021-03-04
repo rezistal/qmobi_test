@@ -22,7 +22,7 @@ public class Core : MonoBehaviour
         for (int i = 0; i <= asteroidsQuantity; i++)
         {
             GameObject asteroid = Instantiate(asteroidPrefab);
-            asteroid.GetComponent<Asteroid>().Init();
+            asteroid.GetComponent<Asteroid>().InitPosition();
             asteroids.Add(asteroid);
         }
 
@@ -48,6 +48,11 @@ public class Core : MonoBehaviour
         {
             StartCoroutine(WaitABit());
         }
+        else if (player.GetComponent<Player>().IsDead())
+        {
+            Instantiate(destroyPrefab, player.transform.position, player.transform.rotation);
+            Destroy(player);
+        }
 
         if(asteroids.Count == 0)
         {
@@ -72,7 +77,7 @@ public class Core : MonoBehaviour
                         Instantiate(destroyPrefab, asteroids[i].transform.position, asteroids[i].transform.rotation);
                     }
                         
-                    asteroids[i].GetComponent<Asteroid>().Die();
+                    Destroy(asteroids[i].GetComponent<Asteroid>());
                     asteroids.RemoveAt(i);
                 }
             }

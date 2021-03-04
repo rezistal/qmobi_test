@@ -7,7 +7,6 @@ public class Player : MonoBehaviour
 {
     private Sprite engineOn;
     private Sprite engineOff;
-    private GameObject destroyPrefab;
     private Rigidbody rb;
     private SpriteRenderer sr;
 
@@ -17,12 +16,12 @@ public class Player : MonoBehaviour
     private Vector3 velocity;
     private float acceleration;
     private bool invincible = false;
+    private bool dead = false;
 
     void Start()
     {
         engineOn = Resources.Load<Sprite>("Sprites/PlayerMove");
         engineOff = Resources.Load<Sprite>("Sprites/Player");
-        destroyPrefab = Resources.Load<GameObject>("Prefabs/AsteroidDestroy");
         acceleration_ratio = 700;
         rotation_ratio = 15;
         rb = GetComponent<Rigidbody>();
@@ -112,9 +111,13 @@ public class Player : MonoBehaviour
     {
         if (!invincible)
         {
-            Instantiate(destroyPrefab, transform.position, transform.rotation);
-            Destroy(gameObject);
+            dead = true;
         }
+    }
+
+    public bool IsDead()
+    {
+        return dead;
     }
 
 }

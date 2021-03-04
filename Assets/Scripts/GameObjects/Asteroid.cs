@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class Asteroid : MonoBehaviour
 {
+    [SerializeField]
     private Rigidbody rb;
+    [SerializeField]
     private SpriteRenderer sr;
 
     [SerializeField]
@@ -17,7 +19,7 @@ public class Asteroid : MonoBehaviour
         return dead;
     }
 
-    public void Init()
+    public void InitPosition()
     {
         int start_health = 3;
         health = (int)Mathf.Pow(2, start_health);
@@ -39,16 +41,12 @@ public class Asteroid : MonoBehaviour
         rb.MovePosition(new Vector3(x, y, 0));
     }
 
-    void Start()
+    private void InitMovement()
     {
-
-        sr = GetComponent<SpriteRenderer>();
-        rb = GetComponent<Rigidbody>();
-
         int rotate = UnityEngine.Random.Range(0, 360);
         rotate += (rotate == 0) || (rotate == 90) || (rotate == 180) || (rotate == 360) ? 20 : 0;
         transform.Rotate(0, 0, rotate);
-        
+
         int velocity = UnityEngine.Random.Range(320, 400);
         rb.velocity = Vector3.zero;
         rb.AddForce(transform.up * velocity / health, ForceMode.VelocityChange);
@@ -56,6 +54,11 @@ public class Asteroid : MonoBehaviour
         float torque = UnityEngine.Random.Range(0.4f, 1.2f);
         rb.angularVelocity = Vector3.zero;
         rb.AddTorque(transform.forward * torque, ForceMode.VelocityChange);
+    }
+
+    void Start()
+    {
+        InitMovement();
     }
 
     void Update()
@@ -117,11 +120,6 @@ public class Asteroid : MonoBehaviour
         health /= 2;
         transform.localScale *= 0.6f;
         return health;
-    }
-
-    public void Die()
-    {
-        Destroy(gameObject);
     }
 
 }

@@ -5,12 +5,16 @@ using UnityEngine;
 [CreateAssetMenu]
 public class ScoreManager : ScriptableObject
 {
-    [SerializeField]
-    public int ScoreValue { get; private set; }
+    private int ScoreValue;
 
     private void OnEnable()
     {
         ScoreValue = 0;
+    }
+
+    public int GetScoreValue()
+    {
+        return ScoreValue;
     }
 
     public void SetScore(int val)

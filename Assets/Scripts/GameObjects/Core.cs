@@ -22,7 +22,6 @@ public class Core : MonoBehaviour
         for (int i = 0; i <= asteroidsQuantity; i++)
         {
             GameObject asteroid = Instantiate(asteroidPrefab);
-            asteroid.GetComponent<Asteroid>().InitPosition();
             asteroids.Add(asteroid);
         }
 
@@ -77,7 +76,7 @@ public class Core : MonoBehaviour
                         Instantiate(destroyPrefab, asteroids[i].transform.position, asteroids[i].transform.rotation);
                     }
                         
-                    Destroy(asteroids[i].GetComponent<Asteroid>());
+                    Destroy(asteroids[i]);
                     asteroids.RemoveAt(i);
                 }
             }

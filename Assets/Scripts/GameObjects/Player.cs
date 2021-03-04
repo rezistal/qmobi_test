@@ -5,9 +5,13 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    [SerializeField]
     private Sprite engineOn;
+    [SerializeField]
     private Sprite engineOff;
+    [SerializeField]
     private Rigidbody rb;
+    [SerializeField]
     private SpriteRenderer sr;
 
     private float deceleration_ratio;
@@ -20,12 +24,13 @@ public class Player : MonoBehaviour
 
     void Start()
     {
-        engineOn = Resources.Load<Sprite>("Sprites/PlayerMove");
-        engineOff = Resources.Load<Sprite>("Sprites/Player");
-        acceleration_ratio = 700;
-        rotation_ratio = 15;
         rb = GetComponent<Rigidbody>();
         sr = GetComponent<SpriteRenderer>();
+        engineOn = Resources.Load<Sprite>("Sprites/PlayerMove");
+        engineOff = Resources.Load<Sprite>("Sprites/Player");
+
+        acceleration_ratio = 700;
+        rotation_ratio = 15;
         rb.mass = 100;
         invincible = true;
         StartCoroutine(Invincible());

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
+    [SerializeField]
     private Rigidbody rb;
     private int bulletSpeed = 500;
 

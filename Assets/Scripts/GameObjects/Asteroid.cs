@@ -13,24 +13,16 @@ public class Asteroid : MonoBehaviour
     private bool dead = false;
     [SerializeField]
     private int health;
+    [SerializeField]
+    private bool childAsteroid;
 
     public bool IsDead()
     {
         return dead;
     }
 
-    public void InitPosition()
+    private void InitPosition()
     {
-        int start_health = 3;
-        health = (int)Mathf.Pow(2, start_health);
-
-        sr = GetComponent<SpriteRenderer>();
-        rb = GetComponent<Rigidbody>();
-
-        int spriteNumber = UnityEngine.Random.Range(1, 3);
-        var sprite = Resources.Load<Sprite>("Sprites/Asteroid" + spriteNumber);
-        sr.sprite = sprite;
-
         int w = Screen.width;
         int h = Screen.height;
         int x = UnityEngine.Random.Range(0, w);
@@ -58,6 +50,21 @@ public class Asteroid : MonoBehaviour
 
     void Start()
     {
+        if (!childAsteroid)
+        {
+            childAsteroid = true;
+            int start_health = 3;
+            health = (int)Mathf.Pow(2, start_health);
+            
+            sr = GetComponent<SpriteRenderer>();
+            rb = GetComponent<Rigidbody>();
+            
+            int spriteNumber = UnityEngine.Random.Range(1, 3);
+            var sprite = Resources.Load<Sprite>("Sprites/Asteroid" + spriteNumber);
+            sr.sprite = sprite;
+
+            InitPosition();
+        }
         InitMovement();
     }
 

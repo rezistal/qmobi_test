@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class FirePoint : MonoBehaviour
 {
+    [SerializeField]
     private GameObject bullet;
 
     void Start()

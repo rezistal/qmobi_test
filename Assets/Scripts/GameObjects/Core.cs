@@ -4,33 +4,90 @@ using UnityEngine;
 
 public class Core : MonoBehaviour
 {
-    
-    private GameObject player;
+    public GameObject asteroidPrefab;
 
-    // Start is called before the first frame update
+    public GameObject player;
+    public GameObject playerPrefab;
+
+    private GameObject destroyPrefab;
+
+    private ScoreManager scoreManager;
+
+    public List<GameObject> asteroids;
+    private List<GameObject> smallAsteroids;
+
+    void SpawnAsteroids()
+    {
+        int asteroidsQuantity = 0; UnityEngine.Random.Range(4, 10);
+        for (int i = 0; i <= asteroidsQuantity; i++)
+        {
+            GameObject asteroid = Instantiate(asteroidPrefab);
+            asteroid.GetComponent<Asteroid>().Init();
+            asteroids.Add(asteroid);
+        }
+
+    }
     void Start()
     {
-       /* player = new Player();
-        Vector3 position = new Vector3(0,0,0);
-        Instantiate(player, position, Quaternion.identity);*/
+        smallAsteroids = new List<GameObject>();
+
+        asteroidPrefab = Resources.Load<GameObject>("Prefabs/Asteroid");
+        SpawnAsteroids();
+
+        playerPrefab = Resources.Load<GameObject>("Prefabs/Player");
+        player = Instantiate(playerPrefab);
+
+        scoreManager = Resources.Load<ScoreManager>("ScriptableObjects/ScoreManager");
+        
+        destroyPrefab = Resources.Load<GameObject>("Prefabs/AsteroidDestroy");
     }
 
-    private void FixedUpdate()
-    {/*
-        if (Input.GetKey(KeyCode.F))
-        {
-
-            float x = UnityEngine.Random.Range(-6, 6);
-            float y = UnityEngine.Random.Range(-4, 4);
-
-            transform.position = new Vector3(x, y, 0);
-            Instantiate(player, position, Quaternion.identity);
-        }*/
-    }
-
-    // Update is called once per frame
     void Update()
     {
-        
+        if (!player)
+        {
+            StartCoroutine(WaitABit());
+        }
+
+        if(asteroids.Count == 0)
+        {
+            SpawnAsteroids();
+        }
+        else
+        {
+            smallAsteroids.Clear();
+            for (int i = asteroids.Count - 1; i >= 0; i--)
+            {
+                if (asteroids[i].GetComponent<Asteroid>().IsDead())
+                {
+                    int health = asteroids[i].GetComponent<Asteroid>().Calculate();
+                    scoreManager.SetScore(health);
+                    if (health > 1)
+                    {
+                        smallAsteroids.Add(Instantiate(asteroids[i], asteroids[i].transform.position, asteroids[i].transform.rotation));
+                        smallAsteroids.Add(Instantiate(asteroids[i], asteroids[i].transform.position, asteroids[i].transform.rotation));
+                    }
+                    else
+                    {
+                        Instantiate(destroyPrefab, asteroids[i].transform.position, asteroids[i].transform.rotation);
+                    }
+                        
+                    asteroids[i].GetComponent<Asteroid>().Die();
+                    asteroids.RemoveAt(i);
+                }
+            }
+            asteroids.AddRange(smallAsteroids);
+        }
     }
+
+    IEnumerator WaitABit()
+    {
+        yield return new WaitForSeconds(2);
+        player = Instantiate(playerPrefab);
+        StopAllCoroutines();
+    }
+
 }
+
+
+

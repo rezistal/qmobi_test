@@ -6,19 +6,20 @@ using UnityEngine;
 public class HealthManager : ScriptableObject
 {
     private int PlayerHealth;
+    [SerializeField]
+    private int StartHealth = 3;
 
     private void OnEnable()
     {
-        PlayerHealth = 5;
-        Player.Died += ReduceHealth;
+        PlayerHealth = StartHealth;
     }
 
-    private void OnDisable()
+    public void RestoreHealth()
     {
-        Player.Died -= ReduceHealth;
+        PlayerHealth += 1;
     }
 
-    private void ReduceHealth()
+    public void ReduceHealth()
     {
         PlayerHealth -= 1;
     }

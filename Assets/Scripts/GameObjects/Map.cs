@@ -16,19 +16,4 @@ public class Map : MonoBehaviour
         
     }
 
-    void OnTriggerEnter(Collider other)
-    {
-        Bullet bullet = other.GetComponent<Bullet>();
-        if (bullet != null)
-        {
-            bullet.Die();
-        }
-        /*
-        // Версия со смертью игрока
-        if(other.name == "Player")
-        {
-            Destroy(other.gameObject);
-        }
-        */
-    }
 }

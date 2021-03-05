@@ -63,10 +63,18 @@ public class Player : MonoBehaviour
         {
             float x = UnityEngine.Random.Range(20, Screen.width - 20);
             float y = UnityEngine.Random.Range(20, Screen.height - 20);
-            rb.MovePosition(new Vector3(x, y, 0));
-        }
 
-        RePosition();
+            int selfDestroy = UnityEngine.Random.Range(0, 101);
+            if(selfDestroy >= 100)
+            {
+                Died();
+            }
+            else
+            {
+                rb.MovePosition(new Vector3(x, y, 0));
+            }
+        }
+        
     }
 
     void Update()
@@ -80,41 +88,8 @@ public class Player : MonoBehaviour
             sr.sprite = engineOff;
         }
     }
-
-    void RePosition()
-    {
-        float range = 20;
-        float x = transform.position.x;
-        float y = transform.position.y;
-        float new_x = x, new_y = y;
-        bool trigger = false;
-        if(x > Screen.width + range)
-        {
-            new_x = 0;
-            trigger = true;
-        }
-        if (x < -range)
-        {
-            new_x = Screen.width + range;
-            trigger = true;
-        }
-        if (y > Screen.height + range)
-        {
-            new_y = 0;
-            trigger = true;
-        }
-        if (y < -range)
-        {
-            new_y = Screen.height + range;
-            trigger = true;
-        }
-        if (trigger)
-        {
-            rb.MovePosition(new Vector3(new_x, new_y, 0));
-        }
-    }
-
-    public void Die()
+    
+    void OnTriggerEnter(Collider other)
     {
         if (!invincible)
         {

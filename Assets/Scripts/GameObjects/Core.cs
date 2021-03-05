@@ -16,37 +16,30 @@ public class Core : MonoBehaviour
 
     void SpawnAsteroids()
     {
-        int asteroidsQuantity = 0; UnityEngine.Random.Range(4, 10);
+        int asteroidsQuantity = -1; // 5; //UnityEngine.Random.Range(4, 10);
         for (int i = 0; i <= asteroidsQuantity; i++)
         {
             Instantiate(asteroidPrefab);
         }
-
     }
 
     private void OnEnable()
     {
         Player.Died += PlayerDied;
-        Asteroid.Collided += ASteroidCollided;
+        Asteroid.Collided += AsteroidCollided;
     }
 
     private void OnDisable()
     {
         Player.Died -= PlayerDied;
-        Asteroid.Collided -= ASteroidCollided;
+        Asteroid.Collided -= AsteroidCollided;
     }
 
-    private void ASteroidCollided(GameObject asteroid, Collider other)
+    private void AsteroidCollided(GameObject asteroid, Collider other)
     {
-        Player player = other.GetComponent<Player>();
         Bullet bullet = other.GetComponent<Bullet>();
-        if(player != null)
-        {
-            player.Die();
-        }
         if(bullet != null)
         {
-            bullet.Die();
             Collider(asteroid);
         }
     }
@@ -54,7 +47,15 @@ public class Core : MonoBehaviour
     private void Collider(GameObject asteroid)
     {
         int health = asteroid.GetComponent<Asteroid>().CalculateHealth();
+
+        int prevScore = scoreManager.GetScoreValue();
         scoreManager.SetScore(health);
+        int currScore = scoreManager.GetScoreValue();
+        if(prevScore / 10000 < currScore / 10000)
+        {
+            healthManager.RestoreHealth();
+        }
+
         if (health > 1)
         {
             Instantiate(asteroid, asteroid.transform.position, asteroid.transform.rotation);
@@ -67,10 +68,10 @@ public class Core : MonoBehaviour
 
         Destroy(asteroid);
     }
-
+    
     private void PlayerDied()
     {
-        //healthManager.ReduceHealth();
+        healthManager.ReduceHealth();
         Instantiate(destroyPrefab, player.transform.position, player.transform.rotation);
         Destroy(player);
         StartCoroutine(WaitABit());

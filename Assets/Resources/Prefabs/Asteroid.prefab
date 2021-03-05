@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7268576678127834221}
   - component: {fileID: 7268576678127834222}
   - component: {fileID: 7268576678127834223}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Asteroid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -46,7 +46,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1b5b5b8f3319c143929e8d0922a9849, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rb: {fileID: 0}
+  sr: {fileID: 0}
   health: 0
+  childAsteroid: 0
 --- !u!212 &7268576678127834221
 SpriteRenderer:
   m_ObjectHideFlags: 0

@@ -20,7 +20,9 @@ public class Player : MonoBehaviour
     private Vector3 velocity;
     private float acceleration;
     private bool invincible = false;
-    private bool dead = false;
+
+    public delegate void PlayerDeath();
+    public static event PlayerDeath Died;
 
     void Start()
     {
@@ -116,13 +118,8 @@ public class Player : MonoBehaviour
     {
         if (!invincible)
         {
-            dead = true;
+            Died();
         }
-    }
-
-    public bool IsDead()
-    {
-        return dead;
     }
 
 }

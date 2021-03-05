@@ -12,76 +12,68 @@ public class Core : MonoBehaviour
     private GameObject destroyPrefab;
 
     private ScoreManager scoreManager;
-
-    public List<GameObject> asteroids;
-    private List<GameObject> smallAsteroids;
+    private HealthManager healthManager;
 
     void SpawnAsteroids()
     {
         int asteroidsQuantity = 0; UnityEngine.Random.Range(4, 10);
         for (int i = 0; i <= asteroidsQuantity; i++)
         {
-            GameObject asteroid = Instantiate(asteroidPrefab);
-            asteroids.Add(asteroid);
+            Instantiate(asteroidPrefab);
         }
 
     }
-    void Start()
+
+    private void OnEnable()
     {
-        smallAsteroids = new List<GameObject>();
-
-        asteroidPrefab = Resources.Load<GameObject>("Prefabs/Asteroid");
-        SpawnAsteroids();
-
-        playerPrefab = Resources.Load<GameObject>("Prefabs/Player");
-        player = Instantiate(playerPrefab);
-
-        scoreManager = Resources.Load<ScoreManager>("ScriptableObjects/ScoreManager");
-        
-        destroyPrefab = Resources.Load<GameObject>("Prefabs/AsteroidDestroy");
+        Player.Died += PlayerDied;
+        Asteroid.Collided += ASteroidCollided;
     }
 
-    void Update()
+    private void OnDisable()
     {
-        if (!player)
-        {
-            StartCoroutine(WaitABit());
-        }
-        else if (player.GetComponent<Player>().IsDead())
-        {
-            Instantiate(destroyPrefab, player.transform.position, player.transform.rotation);
-            Destroy(player);
-        }
+        Player.Died -= PlayerDied;
+        Asteroid.Collided -= ASteroidCollided;
+    }
 
-        if(asteroids.Count == 0)
+    private void ASteroidCollided(GameObject asteroid, Collider other)
+    {
+        Player player = other.GetComponent<Player>();
+        Bullet bullet = other.GetComponent<Bullet>();
+        if(player != null)
         {
-            SpawnAsteroids();
+            player.Die();
+        }
+        if(bullet != null)
+        {
+            bullet.Die();
+            Collider(asteroid);
+        }
+    }
+
+    private void Collider(GameObject asteroid)
+    {
+        int health = asteroid.GetComponent<Asteroid>().CalculateHealth();
+        scoreManager.SetScore(health);
+        if (health > 1)
+        {
+            Instantiate(asteroid, asteroid.transform.position, asteroid.transform.rotation);
+            Instantiate(asteroid, asteroid.transform.position, asteroid.transform.rotation);
         }
         else
         {
-            smallAsteroids.Clear();
-            for (int i = asteroids.Count - 1; i >= 0; i--)
-            {
-                if (asteroids[i].GetComponent<Asteroid>().IsDead())
-                {
-                    int health = asteroids[i].GetComponent<Asteroid>().Calculate();
-                    scoreManager.SetScore(health);
-                    if (health > 1)
-                    {
-                        smallAsteroids.Add(Instantiate(asteroids[i], asteroids[i].transform.position, asteroids[i].transform.rotation));
-                        smallAsteroids.Add(Instantiate(asteroids[i], asteroids[i].transform.position, asteroids[i].transform.rotation));
-                    }
-                    else
-                    {
-                        Instantiate(destroyPrefab, asteroids[i].transform.position, asteroids[i].transform.rotation);
-                    }
-                        
-                    Destroy(asteroids[i]);
-                    asteroids.RemoveAt(i);
-                }
-            }
-            asteroids.AddRange(smallAsteroids);
+            Instantiate(destroyPrefab, asteroid.transform.position, asteroid.transform.rotation);
         }
+
+        Destroy(asteroid);
+    }
+
+    private void PlayerDied()
+    {
+        //healthManager.ReduceHealth();
+        Instantiate(destroyPrefab, player.transform.position, player.transform.rotation);
+        Destroy(player);
+        StartCoroutine(WaitABit());
     }
 
     IEnumerator WaitABit()
@@ -91,6 +83,26 @@ public class Core : MonoBehaviour
         StopAllCoroutines();
     }
 
+    void Start()
+    {
+        //smallAsteroids = new List<GameObject>();
+
+        asteroidPrefab = Resources.Load<GameObject>("Prefabs/Asteroid");
+        SpawnAsteroids();
+
+        playerPrefab = Resources.Load<GameObject>("Prefabs/Player");
+        player = Instantiate(playerPrefab);
+
+        scoreManager = Resources.Load<ScoreManager>("ScriptableObjects/ScoreManager");
+        healthManager = Resources.Load<HealthManager>("ScriptableObjects/HealthManager");
+
+        destroyPrefab = Resources.Load<GameObject>("Prefabs/AsteroidDestroy");
+    }
+
+    void Update()
+    {
+
+    }
 }
 
 

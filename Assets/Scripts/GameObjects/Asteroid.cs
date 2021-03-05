@@ -8,18 +8,14 @@ public class Asteroid : MonoBehaviour
     private Rigidbody rb;
     [SerializeField]
     private SpriteRenderer sr;
-
-    [SerializeField]
-    private bool dead = false;
+ 
     [SerializeField]
     private int health;
     [SerializeField]
     private bool childAsteroid;
 
-    public bool IsDead()
-    {
-        return dead;
-    }
+    public delegate void AsteroidCollided(GameObject o, Collider c);
+    public static event AsteroidCollided Collided;
 
     private void InitPosition()
     {
@@ -68,12 +64,12 @@ public class Asteroid : MonoBehaviour
         InitMovement();
     }
 
-    void Update()
+    private void FixedUpdate()
     {
         RePosition();
     }
 
-    void RePosition()
+    private void RePosition()
     {
         float range = 80;
         float x = transform.position.x;
@@ -108,22 +104,11 @@ public class Asteroid : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Player player = other.GetComponent<Player>();
-        Bullet bullet = other.GetComponent<Bullet>();
-        if(player != null)
-        {
-            player.Die();
-        }
-        if(bullet != null)
-        {
-            bullet.Die();
-            dead = true;
-        }
+        Collided(gameObject, other);
     }
 
-    public int Calculate()
+    public int CalculateHealth()
     {
-        dead = false;
         health /= 2;
         transform.localScale *= 0.6f;
         return health;

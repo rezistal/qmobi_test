@@ -9,7 +9,18 @@ public class HealthManager : ScriptableObject
 
     private void OnEnable()
     {
-        PlayerHealth = 0;
+        PlayerHealth = 5;
+        Player.Died += ReduceHealth;
+    }
+
+    private void OnDisable()
+    {
+        Player.Died -= ReduceHealth;
+    }
+
+    private void ReduceHealth()
+    {
+        PlayerHealth -= 1;
     }
 
     public int GetPlayerHealth()

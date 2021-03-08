@@ -15,6 +15,8 @@ public class Core : MonoBehaviour
     private ScoreManager scoreManager;
     private HealthManager healthManager;
     private ShotManager shotManager;
+    private ScoreboardManager scoreboardManager;
+    private GameObject gameOver;
 
     private float ufoSpawnTimer;
     private float incChance;
@@ -107,7 +109,10 @@ public class Core : MonoBehaviour
         {
             GameOver();
         }
-        StartCoroutine("spawnPlayer");
+        else
+        {
+            StartCoroutine("spawnPlayer");
+        }
     }
 
     IEnumerator spawnPlayer()
@@ -138,10 +143,18 @@ public class Core : MonoBehaviour
         destroyPrefab = Resources.Load<GameObject>("Prefabs/AsteroidDestroy");
         ufoPrefab = Resources.Load<GameObject>("Prefabs/Ufo");
         shotManager = Resources.Load<ShotManager>("ScriptableObjects/ShotManager");
+        scoreboardManager = Resources.Load<ScoreboardManager>("ScriptableObjects/ScoreboardManager");
+
+        gameOver = GameObject.Find("GameOverText");
+        gameOver.SetActive(false);
 
         player = Instantiate(playerPrefab);
         SpawnAsteroids();
         ufoSpawnTimer = 0;
+        
+        healthManager.Reset();
+        scoreManager.Reset();
+        shotManager.Reset();
     }
 
     void Update()
@@ -215,10 +228,13 @@ public class Core : MonoBehaviour
 
     private void GameOver()
     {
-        healthManager.Reset();
-        scoreManager.Reset();
-        shotManager.Reset();
-        SceneManager.LoadScene("Menu");
+        gameOver.SetActive(true);
+
+        if (scoreManager.GetScoreValue() > scoreboardManager.LowestScore())
+        {
+            scoreboardManager.AddResult("test1", scoreManager.GetScoreValue());
+        }
+        //SceneManager.LoadScene("Menu");
     }
 }
 

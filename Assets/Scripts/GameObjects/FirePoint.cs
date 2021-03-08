@@ -6,13 +6,14 @@ public class FirePoint : MonoBehaviour
 {
     [SerializeField]
     private GameObject bullet;
+    private ShotManager shotManager;
 
     void Start()
     {
+        shotManager = Resources.Load<ShotManager>("ScriptableObjects/ShotManager");
         bullet = Resources.Load<GameObject>("Prefabs/Bullet");
-
     }
-    // Update is called once per frame
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
@@ -20,9 +21,13 @@ public class FirePoint : MonoBehaviour
             Shoot();
         }
     }
-
-    void Shoot()
+    
+    private void Shoot()
     {
-        Instantiate(bullet, transform.position, transform.rotation);
+        if(shotManager.Available())
+        {
+            shotManager.PlayerShoot();
+            Instantiate(bullet, transform.position, transform.rotation).layer = gameObject.layer;
+        }
     }
 }

@@ -21,8 +21,7 @@ public class Player : MonoBehaviour
     private float acceleration;
     private bool invincible = false;
 
-    public delegate void PlayerDeath();
-    public static event PlayerDeath Died;
+    public static event EventManager.PlayerDeath Died;
 
     void Start()
     {
@@ -51,6 +50,7 @@ public class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
+        //invincible = true;
         acceleration = 0;
         if (Input.GetKey(KeyCode.W))
         {
@@ -64,8 +64,8 @@ public class Player : MonoBehaviour
             float x = UnityEngine.Random.Range(20, Screen.width - 20);
             float y = UnityEngine.Random.Range(20, Screen.height - 20);
 
-            int selfDestroy = UnityEngine.Random.Range(0, 101);
-            if(selfDestroy >= 100)
+            int selfDestroyChance = UnityEngine.Random.Range(0, 101);
+            if(selfDestroyChance >= 100)
             {
                 Died();
             }
@@ -87,8 +87,10 @@ public class Player : MonoBehaviour
         {
             sr.sprite = engineOff;
         }
+        
+        Warparound.Reposition(rb, transform.position.x, transform.position.y, 20);
     }
-    
+
     void OnTriggerEnter(Collider other)
     {
         if (!invincible)

@@ -7,7 +7,17 @@ using UnityEngine.UI;
 public class Health : MonoBehaviour
 {
     private HealthManager healthManager;
-    private Image[] goArray;
+    private GameObject[] goArray;
+
+    private void OnEnable()
+    {
+        HealthManager.Changed += PrintHearts;
+    }
+
+    private void OnDisable()
+    {
+        HealthManager.Changed -= PrintHearts;
+    }
 
     private void PrintHearts()
     {
@@ -16,11 +26,11 @@ public class Health : MonoBehaviour
         {
             if(i < health)
             {
-                goArray[i].enabled = true;
+                goArray[i].GetComponent<Image>().enabled = true;
 
             } else
             {
-                goArray[i].enabled = false;
+                goArray[i].GetComponent<Image>().enabled = false;
             }
         }
     }
@@ -28,11 +38,13 @@ public class Health : MonoBehaviour
     private void Start()
     {
         healthManager = Resources.Load<HealthManager>("ScriptableObjects/HealthManager");
-        goArray = GetComponentsInChildren<Image>();
-    }
-
-    private void Update()
-    {
+        goArray = new GameObject[5];
+        goArray[0] = GameObject.Find("Health1");
+        goArray[1] = GameObject.Find("Health2");
+        goArray[2] = GameObject.Find("Health3");
+        goArray[3] = GameObject.Find("Health4");
+        goArray[4] = GameObject.Find("Health5");
+        
         PrintHearts();
     }
 }

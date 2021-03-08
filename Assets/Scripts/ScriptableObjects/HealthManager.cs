@@ -9,19 +9,34 @@ public class HealthManager : ScriptableObject
     [SerializeField]
     private int StartHealth = 3;
 
-    private void OnEnable()
+    public static event EventManager.HealthChanged Changed;
+
+    public void Reset()
     {
         PlayerHealth = StartHealth;
     }
 
+    private void OnEnable()
+    {
+        Reset();
+    }
+
     public void RestoreHealth()
     {
-        PlayerHealth += 1;
+        if (PlayerHealth + 1 <= 5)
+        {
+            PlayerHealth += 1;
+            Changed();
+        }
     }
 
     public void ReduceHealth()
     {
-        PlayerHealth -= 1;
+        if (PlayerHealth - 1 >= 0)
+        {
+            PlayerHealth -= 1;
+            Changed();
+        }
     }
 
     public int GetPlayerHealth()

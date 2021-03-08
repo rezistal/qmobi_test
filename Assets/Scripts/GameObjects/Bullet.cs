@@ -8,6 +8,8 @@ public class Bullet : MonoBehaviour
     private Rigidbody rb;
     private int bulletSpeed = 500;
 
+    public static event EventManager.BulletDestroyed Destroyed;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -16,53 +18,22 @@ public class Bullet : MonoBehaviour
 
     private void FixedUpdate()
     {
-        RePosition();
-    }
-
-    private void RePosition()
-    {
-        float range = 0;
-        float x = transform.position.x;
-        float y = transform.position.y;
-        float new_x = x, new_y = y;
-        bool trigger = false;
-        if (x > Screen.width + range)
+        if (Warparound.Reposition(rb, transform.position.x, transform.position.y, 0))
         {
-            new_x = 0;
-            trigger = true;
-        }
-        if (x < -range)
-        {
-            new_x = Screen.width + range;
-            trigger = true;
-        }
-        if (y > Screen.height + range)
-        {
-            new_y = 0;
-            trigger = true;
-        }
-        if (y < -range)
-        {
-            new_y = Screen.height + range;
-            trigger = true;
-        }
-        if (trigger)
-        {
-            rb.MovePosition(new Vector3(new_x, new_y, 0));
             StartCoroutine(Countdown());
         }
-
     }
 
     IEnumerator Countdown()
     {
-        yield return new WaitForSeconds(0.4f);
+        yield return new WaitForSeconds(0.2f);
         StopAllCoroutines();
         Die();
     }
 
     public void Die()
     {
+        Destroyed(gameObject.layer);
         Destroy(gameObject);
     }
 

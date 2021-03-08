@@ -7,9 +7,13 @@ public class ScoreManager : ScriptableObject
 {
     private int ScoreValue;
 
-    private void OnEnable()
+    public void Reset()
     {
         ScoreValue = 0;
+    }
+    private void OnEnable()
+    {
+        Reset();
     }
 
     public int GetScoreValue()
@@ -17,19 +21,50 @@ public class ScoreManager : ScriptableObject
         return ScoreValue;
     }
 
-    public void SetScore(int val)
+    private bool FreeShip(int increment)
     {
-        switch (val)
+        if ((ScoreValue - increment) / 10000 < ScoreValue  / 10000)
         {
-            case 4:
-                ScoreValue += 20;
+            return true;
+        }
+        return false;
+    }
+
+    public bool SetScore(int val, string type)
+    {
+        int increment = 0;
+        switch (type)
+        {
+            case "asteroid":
+                switch (val)
+                {
+                    case 4:
+                        increment += 20;
+                        break;
+                    case 2:
+                        increment += 50;
+                        break;
+                    default:
+                        increment += 100;
+                        break;
+                }
                 break;
-            case 2:
-                ScoreValue += 50;
-                break;
-            default:
-                ScoreValue += 100;
+            case "ufo":
+                switch (val)
+                {
+                    case 1:
+                        increment += 1000;
+                        break;
+                    case 2:
+                        increment += 200;
+                        break;
+                    default:
+                        increment += 0;
+                        break;
+                }
                 break;
         }
+        ScoreValue += increment;
+        return FreeShip(increment);
     }
 }

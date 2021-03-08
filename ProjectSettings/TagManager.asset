@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - Hearts
+  - Ufo
+  - Asteroid
+  - Bullet
   layers:
   - Default
   - TransparentFX
@@ -16,10 +19,10 @@ TagManager:
   - 
   - Asteroids
   - Player
-  - Bullets
+  - PlayerBullets
   - Map
   - Ufo
-  - 
+  - UfoBullets
   - 
   - 
   - 
@@ -41,4 +44,7 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: 1
+    uniqueID: 2493442799
     locked: 0

@@ -18,7 +18,7 @@ public class ScoreManager : ScriptableObject
 
     public int GetScoreValue()
     {
-        return ScoreValue;
+        return ScoreValue >= 99000 ? 99000 : ScoreValue;
     }
 
     private bool FreeShip(int increment)

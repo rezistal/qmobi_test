@@ -31,7 +31,7 @@ public class Player : MonoBehaviour
         engineOff = Resources.Load<Sprite>("Sprites/Player");
 
         acceleration_ratio = 700;
-        rotation_ratio = 15;
+        rotation_ratio = 11;
         rb.mass = 100;
         invincible = true;
         StartCoroutine(Invincible());

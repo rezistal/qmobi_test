@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class Core : MonoBehaviour
@@ -16,7 +17,9 @@ public class Core : MonoBehaviour
     private HealthManager healthManager;
     private ShotManager shotManager;
     private ScoreboardManager scoreboardManager;
-    private GameObject gameOver;
+    private GameObject gameOverUI;
+    private GameObject playerInput;
+    private GameObject playerInputText;
 
     private float ufoSpawnTimer;
     private float incChance;
@@ -36,6 +39,100 @@ public class Core : MonoBehaviour
         Player.Died -= PlayerDied;
         Asteroid.Collided -= Collided;
         Ufo.Collided -= Collided;
+    }
+
+    void Start()
+    {
+        asteroidPrefab = Resources.Load<GameObject>("Prefabs/Asteroid");
+        playerPrefab = Resources.Load<GameObject>("Prefabs/Player");
+        scoreManager = Resources.Load<ScoreManager>("ScriptableObjects/ScoreManager");
+        healthManager = Resources.Load<HealthManager>("ScriptableObjects/HealthManager");
+        destroyPrefab = Resources.Load<GameObject>("Prefabs/AsteroidDestroy");
+        ufoPrefab = Resources.Load<GameObject>("Prefabs/Ufo");
+        shotManager = Resources.Load<ShotManager>("ScriptableObjects/ShotManager");
+        scoreboardManager = Resources.Load<ScoreboardManager>("ScriptableObjects/ScoreboardManager");
+
+        gameOverUI = GameObject.Find("GameOver");
+        gameOverUI.SetActive(false);
+
+        player = Instantiate(playerPrefab);
+        SpawnAsteroids();
+        ufoSpawnTimer = 0;
+
+        healthManager.Reset();
+        scoreManager.Reset();
+        shotManager.Reset();
+    }
+
+    void Update()
+    {
+        //If there is no other ufo and ufo spawn allowed
+        if (ufo == null && !denyUfoSpawn)
+        {
+            ufoSpawnTimer += Time.deltaTime;
+            //Every 10 seconds
+            if (ufoSpawnTimer > 10f)
+            {
+
+                //Appears a chance to create Ufo
+                //float createChance = UnityEngine.Random.Range(0.0f, 1.0f);
+                if (UnityEngine.Random.value + incChance >= 0.99999)
+                {
+                    //Nullify timer and chance increaser
+                    ufoSpawnTimer = 0;
+                    incChance = 0;
+
+                    SpawnUfo();
+                }
+                //If ufo didnt created - we increase a chance every frame
+                incChance += 0.00001f;
+            }
+        }
+
+        //Check is there more asteroids on a scene
+        CheckAsteroids();
+
+        //Detecting user input after gameover
+        if (playerInputText != null && playerInputText.activeSelf == true)
+        {
+            string playerName = playerInputText.GetComponent<Text>().text;
+            if (playerName.Length == 3 && Input.GetKeyDown(KeyCode.Return))
+            {
+                scoreboardManager.AddResult(playerName, scoreManager.GetScoreValue());
+                SceneManager.LoadScene("Menu");
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            SceneManager.LoadScene("Menu");
+        }
+    }
+
+    IEnumerator spawnPlayer()
+    {
+        yield return new WaitForSeconds(2);
+        player = Instantiate(playerPrefab);
+        StopCoroutine("spawnPlayer");
+    }
+
+    IEnumerator spawnAsteroids()
+    {
+        yield return new WaitForSeconds(3);
+
+        SpawnAsteroids();
+        if (ufo != null)
+        {
+            Destroy(ufo);
+        }
+        StopCoroutine("spawnAsteroids");
+    }
+
+    IEnumerator ShowGameOver()
+    {
+        yield return new WaitForSeconds(3);
+        StopCoroutine("ShowGameOver");
+        CheckScoreboard();
     }
 
     private void Collided(GameObject obj, Collider other)
@@ -96,8 +193,8 @@ public class Core : MonoBehaviour
         }
         Destroy(obj);
 
-        //Check is there more asteroids on a scene
-        CheckAsteroids();
+        CheckScoreLimit();
+
     }
     
     private void PlayerDied()
@@ -107,79 +204,11 @@ public class Core : MonoBehaviour
         Destroy(player);
         if (healthManager.GetPlayerHealth() == 0)
         {
-            GameOver();
+            GameOver("outOfLives");
         }
         else
         {
             StartCoroutine("spawnPlayer");
-        }
-    }
-
-    IEnumerator spawnPlayer()
-    {
-        yield return new WaitForSeconds(2);
-        player = Instantiate(playerPrefab);
-        StopCoroutine("spawnPlayer");
-    }
-
-    IEnumerator spawnAsteroids()
-    {
-        yield return new WaitForSeconds(3);
-
-            SpawnAsteroids();
-            if (ufo != null)
-            {
-                Destroy(ufo);
-            }
-        StopCoroutine("spawnAsteroids");
-    }
-
-    void Start()
-    {
-        asteroidPrefab = Resources.Load<GameObject>("Prefabs/Asteroid");
-        playerPrefab = Resources.Load<GameObject>("Prefabs/Player");
-        scoreManager = Resources.Load<ScoreManager>("ScriptableObjects/ScoreManager");
-        healthManager = Resources.Load<HealthManager>("ScriptableObjects/HealthManager");
-        destroyPrefab = Resources.Load<GameObject>("Prefabs/AsteroidDestroy");
-        ufoPrefab = Resources.Load<GameObject>("Prefabs/Ufo");
-        shotManager = Resources.Load<ShotManager>("ScriptableObjects/ShotManager");
-        scoreboardManager = Resources.Load<ScoreboardManager>("ScriptableObjects/ScoreboardManager");
-
-        gameOver = GameObject.Find("GameOverText");
-        gameOver.SetActive(false);
-
-        player = Instantiate(playerPrefab);
-        SpawnAsteroids();
-        ufoSpawnTimer = 0;
-        
-        healthManager.Reset();
-        scoreManager.Reset();
-        shotManager.Reset();
-    }
-
-    void Update()
-    {
-        //If there is no other ufo and ufo spawn allowed
-        if (ufo == null && !denyUfoSpawn)
-        {
-            ufoSpawnTimer += Time.deltaTime;
-            //Every 10 seconds
-            if (ufoSpawnTimer > 10f)
-            {
-
-                //Appears a chance to create Ufo
-                //float createChance = UnityEngine.Random.Range(0.0f, 1.0f);
-                if (UnityEngine.Random.value + incChance >= 0.99999)
-                {
-                    //Nullify timer and chance increaser
-                    ufoSpawnTimer = 0;
-                    incChance = 0;
-
-                    SpawnUfo();
-                }
-                //If ufo didnt created - we increase a chance every frame
-                incChance += 0.00001f;
-            }
         }
     }
 
@@ -197,9 +226,17 @@ public class Core : MonoBehaviour
             denyUfoSpawn = false;
         }
         
-        if(asteroidsArray.Length == 1)
+        if(asteroidsArray.Length <= 1)
         {
             StartCoroutine("spawnAsteroids");
+        }
+    }
+
+    private void CheckScoreLimit()
+    {
+        if(scoreManager.GetScoreValue() == 99000)
+        {
+            GameOver("maximumScores");
         }
     }
 
@@ -226,17 +263,44 @@ public class Core : MonoBehaviour
 
     }
 
-    private void GameOver()
+    private void GameOver(string condition)
     {
-        gameOver.SetActive(true);
 
+        denyUfoSpawn = true;
+
+        gameOverUI.SetActive(true);
+        playerInput = GameObject.Find("PlayerInput");
+        playerInputText = GameObject.Find("PlayerInputText");
+        playerInput.SetActive(false);
+
+        if (condition == "maximumScores")
+        {
+            Destroy(player);
+            Text dialog = GameObject.Find("GameOverText").GetComponent<Text>();
+            dialog.text = "YOU HAVE REACHED\n" +
+                "MAXIMUM SCORE AVAILABLE!";
+        }
+
+        StartCoroutine("ShowGameOver");
+    }
+
+    private void CheckScoreboard()
+    {
         if (scoreManager.GetScoreValue() > scoreboardManager.LowestScore())
         {
-            scoreboardManager.AddResult("test1", scoreManager.GetScoreValue());
+            playerInput.SetActive(true);
+            playerInput.GetComponent<InputField>().Select();
+            playerInput.GetComponent<InputField>().ActivateInputField();
+
+            Text dialog = GameObject.Find("GameOverText").GetComponent<Text>();
+            dialog.text = "YOUR SCORE IS ONE OF THE FOUR BEST\n" +
+                "PLEASE ENTER YOUR INITIALS\n" +
+                "PUSH ENTER WHEN IS READY TO SAVE";
+            dialog.fontSize = 30;
         }
-        //SceneManager.LoadScene("Menu");
+        else
+        {
+            SceneManager.LoadScene("Menu");
+        }
     }
 }
-
-
-
